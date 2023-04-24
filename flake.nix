@@ -5,10 +5,10 @@
     flake-parts.url = "github:hercules-ci/flake-parts";
     flake.url = "github:srid/empty-flake"; # TODO: Change this to bottom-flake (error's out when building)
   };
-  outputs = inputs@{ flake-parts, systems, flake, ... }:
+  outputs = inputs@{ self, flake-parts, systems, flake, ... }:
     flake-parts.lib.mkFlake { inherit inputs; } {
       systems = import systems;
-      perSystem = { pkgs, lib, system, ... }: {
+      perSystem = { self', pkgs, lib, system, ... }: {
         packages.default =
           let
             lookupFlake = k:
@@ -24,6 +24,15 @@
           pkgs.runCommand "devour-output" { inherit paths; } ''
             echo -n $paths > $out
           '';
+
+        apps.default.program = pkgs.writeShellApplication {
+          name = "devour-flake";
+          runtimeInputs = [ pkgs.nix ];
+          text = ''
+            nix build -L --no-link --print-out-paths ${self}#default --override-input flake "$1" \
+              | xargs cat
+          '';
+        };
       };
     };
 }
