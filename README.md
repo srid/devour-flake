@@ -21,3 +21,6 @@ nix build github:srid/devour-flake \
 
 Pipe this to `| xargs cat | cachix push <name>` to [push all flake outputs to cachix](https://github.com/juspay/jenkins-nix-ci/commit/71003fbaaba8a17e02bc74c70504ebacc6a5818c)!
 
+## Who uses it
+
+- In Jenkins CI ([jenkins-nix-ci](https://github.com/juspay/jenkins-nix-ci)), for building all flake outputs and pushing them to cachix: https://github.com/juspay/jenkins-nix-ci/commit/20a9f0ab337a14d0fdb23c1a526bae0d5b4e5536
