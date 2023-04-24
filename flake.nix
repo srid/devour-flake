@@ -5,7 +5,7 @@
     flake-parts.url = "github:hercules-ci/flake-parts";
     flake = { };
   };
-  outputs = inputs@{ self, flake-parts, systems, ... }:
+  outputs = inputs@{ flake-parts, systems, ... }:
     flake-parts.lib.mkFlake { inherit inputs; } {
       systems = import systems;
       perSystem = { self', pkgs, lib, system, ... }: {
@@ -24,17 +24,6 @@
           pkgs.runCommand "devour-output" { inherit paths; } ''
             echo -n $paths > $out
           '';
-
-        /*
-        apps.default.program = pkgs.writeShellApplication {
-          name = "devour-flake";
-          runtimeInputs = [ pkgs.nix ];
-          text = ''
-            nix build -L --no-link --print-out-paths ${self}#default --override-input flake "$1" \
-              | xargs cat
-          '';
-        };
-        */
       };
     };
 }

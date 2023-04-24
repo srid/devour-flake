@@ -21,12 +21,3 @@ nix build github:srid/devour-flake \
 
 Pipe this to `| xargs cat | cachix push <name>` to [push all flake outputs to cachix](https://github.com/juspay/jenkins-nix-ci/commit/71003fbaaba8a17e02bc74c70504ebacc6a5818c)!
 
-<details>
-<summary>WIP</summary>
-Alternatively, you can also `nix run` this program directly:
-
-```bash
-nix run github:srid/devour-flake github:nammayatri/nammayatri \
-  | cachix push <name>
-``` 
-</details>
