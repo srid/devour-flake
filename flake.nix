@@ -5,7 +5,7 @@
     flake-parts.url = "github:hercules-ci/flake-parts";
     flake = { };
   };
-  outputs = inputs@{ self, flake-parts, systems, flake, ... }:
+  outputs = inputs@{ self, flake-parts, systems, ... }:
     flake-parts.lib.mkFlake { inherit inputs; } {
       systems = import systems;
       perSystem = { self', pkgs, lib, system, ... }: {
@@ -14,17 +14,18 @@
             lookupFlake = k:
               lib.attrByPath [ k system ] { };
             paths = lib.concatMap lib.attrValues [
-              (lookupFlake "packages" flake)
-              (lookupFlake "checks" flake)
-              (lookupFlake "devShells" flake)
+              (lookupFlake "packages" inputs.flake)
+              (lookupFlake "checks" inputs.flake)
+              (lookupFlake "devShells" inputs.flake)
               (lib.mapAttrs (_: app: app.program)
-                (lookupFlake "apps" flake))
+                (lookupFlake "apps" inputs.flake))
             ];
           in
           pkgs.runCommand "devour-output" { inherit paths; } ''
             echo -n $paths > $out
           '';
 
+        /*
         apps.default.program = pkgs.writeShellApplication {
           name = "devour-flake";
           runtimeInputs = [ pkgs.nix ];
@@ -33,6 +34,7 @@
               | xargs cat
           '';
         };
+        */
       };
     };
 }
