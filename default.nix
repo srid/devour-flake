@@ -6,9 +6,12 @@ pkgs.writeShellApplication {
   name = "devour-flake";
   runtimeInputs = [ pkgs.nix ];
   text = ''
-    nix build ${devour-flake}#default \
+    FLAKE="$1"
+    shift 1 || true
+
+    nix "$@" build ${devour-flake}#default \
       -L --no-link --print-out-paths \
-      --override-input flake "$1" \
+      --override-input flake "$FLAKE" \
       | xargs cat 
   '';
 }
