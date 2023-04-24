@@ -3,7 +3,7 @@
     nixpkgs.url = "github:nixos/nixpkgs/nixpkgs-unstable";
     systems.url = "github:nix-systems/default";
     flake-parts.url = "github:hercules-ci/flake-parts";
-    flake.url = "github:srid/empty-flake"; # TODO: Change this to bottom-flake (error's out when building)
+    flake = { };
   };
   outputs = inputs@{ self, flake-parts, systems, flake, ... }:
     flake-parts.lib.mkFlake { inherit inputs; } {
