@@ -11,18 +11,18 @@
       perSystem = { pkgs, lib, system, ... }: {
         packages.default =
           let
-            drvs = lib.concatMap builtins.attrValues [
-              flake.packages.${system}
-              flake.checks.${system}
-              flake.devShells.${system}
+            lookupFlake = k:
+              lib.attrByPath [ k system ] { };
+            paths = lib.concatMap lib.attrValues [
+              (lookupFlake "packages" flake)
+              (lookupFlake "checks" flake)
+              (lookupFlake "devShells" flake)
+              (lib.mapAttrs (_: app: app.program)
+                (lookupFlake "apps" flake))
             ];
-            paths = map (app: app.program) (lib.attrValues
-              flake.apps.${system});
           in
-          pkgs.runCommand "devour-output" { inherit drvs paths; } ''
-            touch $out
-            echo $drvs | tee -a $out
-            echo $paths | tee -a $out
+          pkgs.runCommand "devour-output" { inherit paths; } ''
+            echo -n $paths > $out
           '';
       };
     };
