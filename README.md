@@ -14,8 +14,6 @@ To workaround this, we create a "consumer" flake that will depend on all outputs
 To build all of the [nammayatri](https://github.com/nammayatri/nammayatri) flake outputs for example:
 
 ```bash
-# Replace 'nix' with 'nom' <https://github.com/maralorn/nix-output-monitor> for
-# nicer progress.
 nix build github:srid/devour-flake \
   -L --no-link --print-out-paths \
   --override-input flake github:nammayatri/nammayatri
@@ -23,9 +21,12 @@ nix build github:srid/devour-flake \
 
 Pipe this to `| xargs cat | cachix push <name>` to [push all flake outputs to cachix](https://github.com/juspay/jenkins-nix-ci/commit/71003fbaaba8a17e02bc74c70504ebacc6a5818c)!
 
+<details>
+<summary>WIP</summary>
 Alternatively, you can also `nix run` this program directly:
 
 ```bash
 nix run github:srid/devour-flake github:nammayatri/nammayatri \
   | cachix push <name>
 ``` 
+</details>
