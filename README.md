@@ -14,6 +14,6 @@ To workaround this, we create a "consumer" flake that will depend on all outputs
 To build all of the [nammayatri](https://github.com/nammayatri/nammayatri) flake outputs for example:
 
 ```bash
-nix build -L github:srid/devour-flake -- \
-  --override-input flake github:nammayatri/nammayatri \
+nix build -L github:srid/devour-flake \
+  --override-input flake github:nammayatri/nammayatri
 ```
