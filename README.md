@@ -2,6 +2,8 @@
 
 Devour all outputs in a flake.
 
+<img src="./logo.webp" width=200 />
+
 ## Why?
 
 Running `nix build .#a .#b ... .#z` on a flake with that many outputs can be rather slow if the evaluation of those packages are non-trivial. Nix evaluates separately for *each* of the argument (as if not using the [eval cache](https://www.tweag.io/blog/2020-06-25-eval-cache/)).
