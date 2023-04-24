@@ -29,7 +29,7 @@ Add this as a non-flake input, to use just the `default.nix`:
 ```nix
 {
   inputs = {
-    devour-flake.url = "github:srid/devour-flake/cat";
+    devour-flake.url = "github:srid/devour-flake";
     devour-flake.flake = false;
   };
 }
