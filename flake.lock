@@ -1,5 +1,20 @@
 {
   "nodes": {
+    "flake": {
+      "locked": {
+        "lastModified": 1682358516,
+        "narHash": "sha256-hTJPMh9Bwky2TlaWmLrkBHdUBmpxSCPRK+bmnFNpNQE=",
+        "owner": "srid",
+        "repo": "empty-flake",
+        "rev": "6629bbcefe33c0213eb88d60409af292632914e8",
+        "type": "github"
+      },
+      "original": {
+        "owner": "srid",
+        "repo": "empty-flake",
+        "type": "github"
+      }
+    },
     "flake-parts": {
       "inputs": {
         "nixpkgs-lib": "nixpkgs-lib"
@@ -54,6 +69,7 @@
     },
     "root": {
       "inputs": {
+        "flake": "flake",
         "flake-parts": "flake-parts",
         "nixpkgs": "nixpkgs",
         "systems": "systems"

@@ -14,6 +14,8 @@ To workaround this, we create a "consumer" flake that will depend on all outputs
 To build all of the [nammayatri](https://github.com/nammayatri/nammayatri) flake outputs for example:
 
 ```bash
+# Replace 'nix' with 'nom' <https://github.com/maralorn/nix-output-monitor> for
+# nicer progress.
 nix build github:srid/devour-flake \
   -L --no-link --print-out-paths \
   --override-input flake github:nammayatri/nammayatri
