@@ -48,4 +48,4 @@ Use `pkgs.devour-flake` to get a convenient executable that will devour the give
 
 ## Who uses it
 
-- In Jenkins CI ([jenkins-nix-ci](https://github.com/juspay/jenkins-nix-ci)), for building all flake outputs and pushing them to cachix: https://github.com/juspay/jenkins-nix-ci/commit/20a9f0ab337a14d0fdb23c1a526bae0d5b4e5536
+- In Jenkins CI ([jenkins-nix-ci](https://github.com/juspay/jenkins-nix-ci)), for building all flake outputs and pushing them to cachix.
