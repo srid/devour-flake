@@ -1,15 +1,15 @@
-{ pkgs, devour-flake, ... }:
+{ writeShellApplication, nix, ... }:
 
 # A convenient invoker for https://github.com/srid/devour-flake that then
 # outputs the built derivations to stdout.
-pkgs.writeShellApplication {
+writeShellApplication {
   name = "devour-flake";
-  runtimeInputs = [ pkgs.nix ];
+  runtimeInputs = [ nix ];
   text = ''
     FLAKE="$1"
     shift 1 || true
 
-    nix "$@" build ${devour-flake}#default \
+    nix "$@" build ${./.}#default \
       -L --no-link --print-out-paths \
       --override-input flake "$FLAKE" \
       | xargs cat 

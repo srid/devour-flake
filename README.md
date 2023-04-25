@@ -26,7 +26,7 @@ Pipe this to `| xargs cat | cachix push <name>` to [push all flake outputs to ca
 ### Nix app
 
 
-Add this as a non-flake input, to use just the `default.nix`:
+Add this repo as a non-flake input:
 
 ```nix
 {
@@ -41,7 +41,7 @@ Then, add an overlay entry to your nixpkgs:
 
 ```nix
 {
-  devour-flake = self.callPackage inputs.devour-flake { inherit (inputs) devour-flake; };
+  devour-flake = self.callPackage inputs.devour-flake { };
 }
 ```
 
