@@ -45,7 +45,7 @@ Then, add an overlay entry to your nixpkgs:
 }
 ```
 
-Use `pkgs.devour-flake` to get a convenient executable that will devour the given flake and spit out the out paths.
+Use `pkgs.devour-flake` to get a convenient executable that will devour the given flake and spit out the out paths. You can then use this in CI to build all outputs of a flake.
 
 
 ## Who uses it
