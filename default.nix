@@ -10,7 +10,7 @@ writeShellApplication {
     shift 1 || true
 
     nix "$@" build ${./.}#default \
-      -L --no-link --print-out-paths \
+      -L --no-link --print-out-paths --no-update-lock-file \
       --override-input flake "$FLAKE" \
       | xargs cat 
   '';
