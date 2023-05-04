@@ -47,6 +47,30 @@ Then, add an overlay entry to your nixpkgs:
 
 Use `pkgs.devour-flake` to get a convenient executable that will devour the given flake and spit out the out paths. You can then use this in CI to build all outputs of a flake.
 
+#### `nix-build-all`
+
+For a CI-friendly command that builds all flake outputs, in addition to checking for `flake.lock` consistency, use:
+
+```nix
+{ pkgs, ... }:
+
+pkgs.writeShellApplication {
+  name = "nix-build-all";
+  runtimeInputs = [
+    pkgs.nix
+    pkgs.devour-flake
+  ];
+  text = ''
+    # Make sure that flake.lock is sync
+    nix flake lock --no-update-lock-file
+
+    # Do a full nix build (all outputs)
+    # This uses https://github.com/srid/devour-flake
+    devour-flake . "$@"
+  '';
+}
+```
+
 
 ## Who uses it
 
