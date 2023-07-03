@@ -9,7 +9,8 @@ writeShellApplication {
     FLAKE="$1"
     shift 1 || true
 
-    nix "$@" build ${./.}#default \
+    nix build ${./.}#default \
+      "$@" \
       -L --no-link --print-out-paths \
       --override-input flake "$FLAKE" \
       | xargs cat 
