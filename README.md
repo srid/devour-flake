@@ -49,6 +49,10 @@ Use `pkgs.devour-flake` to get a convenient executable that will devour the give
 
 #### `nix-build-all`
 
+> **Note**
+>
+> **See also**: [nixci](https://github.com/srid/nixci), an improved version of `nix-build-all`.
+
 For a CI-friendly command that builds all flake outputs, in addition to checking for `flake.lock` consistency, use:
 
 ```nix
