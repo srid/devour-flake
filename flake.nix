@@ -31,8 +31,10 @@
               flake = {
                 lookupFlake = k: lib.attrByPath [ k ] { };
                 getDrv = {
-                  nixosConfigurations = _: cfg: [ cfg.config.system.build.toplevel ];
-                  darwinConfigurations = _: cfg: [ cfg.config.system.build.toplevel ];
+                  nixosConfigurations = _: cfg:
+                    lib.optional pkgs.stdenv.isLinux cfg.config.system.build.toplevel;
+                  darwinConfigurations = _: cfg: 
+                    lib.optional pkgs.stdenv.isDarwin cfg.config.system.build.toplevel;
                 };
               };
             };
