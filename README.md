@@ -10,6 +10,15 @@ Running `nix build .#a .#b ... .#z` on a flake with that many outputs can be rat
 
 To workaround this, we create a "consumer" flake that will depend on all outputs in the given input flake, and then run `nix build` *on the* consumer flake, which will then evaluate the input flake's packages only once.
 
+devour-flake currently detects the following flake outputs:
+
+| Type | Output Key |
+| -- | -- |
+| Standard flake outputs | `packages`, `apps`, `checks`, `devShells` |
+| NixOS | `nixosConfigurations.*` |
+| nix-darwin | `darwinConfigurations.*` |
+| home-manager | `legacyPackages.${system}.homeConfigurations.*` |
+
 
 ## Usage
 
