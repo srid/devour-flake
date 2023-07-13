@@ -23,6 +23,12 @@
                   apps = app: app.program;
                 };
               };
+              flake = {
+                lookupFlake = k: lib.attrByPath [ k ] { };
+                getDrv = {
+                  nixosConfigurations = cfg: cfg.config.system.build.toplevel;
+                };
+              };
             };
             paths =
               lib.flip lib.mapAttrsToList flakeSchema (lvl: lvlSchema:
