@@ -27,6 +27,7 @@
                 lookupFlake = k: lib.attrByPath [ k ] { };
                 getDrv = {
                   nixosConfigurations = cfg: cfg.config.system.build.toplevel;
+                  darwinConfigurations = cfg: cfg.config.system.build.toplevel;
                 };
               };
             };
