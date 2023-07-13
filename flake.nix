@@ -17,20 +17,32 @@
               perSystem = {
                 lookupFlake = k: lib.attrByPath [ k system ] { };
                 getDrv = {
-                  packages = x: x;
-                  checks = x: x;
-                  devShells = x: x;
-                  apps = app: app.program;
+                  packages = _: x: [ x ];
+                  checks = _: x: [ x ];
+                  devShells = _: x: [ x ];
+                  apps = _: app: [ app.program ];
+                  legacyPackages = k: v:
+                    if k == "homeConfigurations"
+                    then
+                      lib.mapAttrsToList (_: cfg: cfg.activationPackage) v
+                    else [ ];
+                };
+              };
+              flake = {
+                lookupFlake = k: lib.attrByPath [ k ] { };
+                getDrv = {
+                  nixosConfigurations = _: cfg: [ cfg.config.system.build.toplevel ];
+                  darwinConfigurations = _: cfg: [ cfg.config.system.build.toplevel ];
                 };
               };
             };
             paths =
               lib.flip lib.mapAttrsToList flakeSchema (lvl: lvlSchema:
                 lib.flip lib.mapAttrsToList lvlSchema.getDrv (kind: getDrv:
-                  builtins.map
+                  lib.mapAttrsToList
                     getDrv
-                    (lib.attrValues (lvlSchema.lookupFlake kind inputs.flake)))
-              ) ;
+                    (lvlSchema.lookupFlake kind inputs.flake))
+              );
           in
           pkgs.runCommand "devour-output" { inherit paths; } ''
             echo -n $paths > $out
