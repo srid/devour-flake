@@ -13,6 +13,6 @@ writeShellApplication {
       "$@" \
       -L --no-link --print-out-paths \
       --override-input flake "$FLAKE" \
-      | xargs cat 
+      | xargs -I{} sh -c 'echo -n "{} "; cat {}'
   '';
 }
