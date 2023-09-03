@@ -9,7 +9,10 @@
       systems = import systems;
       perSystem = { self', pkgs, lib, system, ... }: {
         packages = {
+          # Build all derivations in a flake (or download them from the cache)
           devour-flake = pkgs.callPackage ./pkgs/devour-flake.nix { };
+          # Only build all uncached derivations in flake
+          devour-flake-uncached = pkgs.callPackage ./pkgs/devour-flake-uncached.nix { };
         };
       };
     };
