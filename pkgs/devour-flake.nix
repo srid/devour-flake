@@ -12,6 +12,7 @@ writeShellApplication {
     nix build ${../devour}#default \
       "$@" \
       -L --no-link --print-out-paths \
+      --reference-lock-file ${../flake.lock} \
       --override-input flake "$FLAKE" \
       | xargs cat 
   '';
