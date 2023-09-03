@@ -9,7 +9,7 @@ writeShellApplication {
     FLAKE="$1"
     shift 1 || true
 
-    nix build ${./.}#default \
+    nix build ${./devour}#default \
       "$@" \
       -L --no-link --print-out-paths \
       --override-input flake "$FLAKE" \
