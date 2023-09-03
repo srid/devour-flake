@@ -37,7 +37,7 @@ writeShellApplication {
       | (
         cd "$outDir"
         1>&2 xargs nix-build-uncached
-        echo ./* | xargs --no-run-if-empty readlink
+        find . -type l -exec readlink '{}' \;
       )
   '';
 }
