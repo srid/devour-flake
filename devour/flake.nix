@@ -46,9 +46,7 @@
                     (lvlSchema.lookupFlake kind inputs.flake))
               );
           in
-          pkgs.runCommand "devour-output" { inherit paths; } ''
-            echo -n $paths > $out
-          '';
+          pkgs.writeText "devour-output" (lib.strings.concatLines (lib.lists.flatten paths));
       };
     };
 }
