@@ -30,7 +30,7 @@ nix build github:srid/devour-flake \
   --override-input flake github:nammayatri/nammayatri
 ```
 
-Pipe this to `| xargs cat | cachix push <name>` to [push all flake outputs to cachix](https://github.com/juspay/jenkins-nix-ci/commit/71003fbaaba8a17e02bc74c70504ebacc6a5818c)!
+Pipe this to `| cachix push <name>` to [push all flake outputs to cachix](https://github.com/juspay/jenkins-nix-ci/commit/71003fbaaba8a17e02bc74c70504ebacc6a5818c)!
 
 ### Nix app
 
