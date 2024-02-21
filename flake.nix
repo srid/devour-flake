@@ -11,6 +11,7 @@
       perSystem = { self', pkgs, lib, system, ... }: {
         packages.default =
           let
+            configForCurrentSystem = cfg: cfg.config.nixpkgs.hostPlatform.system == system;
             # Given a flake output key, how to get the buildable derivation for
             # any of its attr values?
             flakeSchema = {
@@ -32,9 +33,9 @@
                 lookupFlake = k: lib.attrByPath [ k ] { };
                 getDrv = {
                   nixosConfigurations = _: cfg:
-                    lib.optional pkgs.stdenv.isLinux cfg.config.system.build.toplevel;
+                    lib.optional (configForCurrentSystem cfg) cfg.config.system.build.toplevel;
                   darwinConfigurations = _: cfg: 
-                    lib.optional pkgs.stdenv.isDarwin cfg.config.system.build.toplevel;
+                    lib.optional (configForCurrentSystem cfg) cfg.config.system.build.toplevel;
                 };
               };
             };
