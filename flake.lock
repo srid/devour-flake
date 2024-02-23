@@ -1,5 +1,20 @@
 {
   "nodes": {
+    "allowed-systems": {
+      "locked": {
+        "lastModified": 1681028828,
+        "narHash": "sha256-Vy1rq5AaRuLzOxct8nz4T6wlgyUR7zLU309k9mBC768=",
+        "owner": "nix-systems",
+        "repo": "default",
+        "rev": "da67096a3b9bf56a91d16901293e51ba5b49a27e",
+        "type": "github"
+      },
+      "original": {
+        "owner": "nix-systems",
+        "repo": "default",
+        "type": "github"
+      }
+    },
     "flake-parts": {
       "inputs": {
         "nixpkgs-lib": "nixpkgs-lib"
@@ -54,6 +69,7 @@
     },
     "root": {
       "inputs": {
+        "allowed-systems": "allowed-systems",
         "flake-parts": "flake-parts",
         "nixpkgs": "nixpkgs",
         "systems": "systems"
@@ -61,16 +77,16 @@
     },
     "systems": {
       "locked": {
-        "lastModified": 1681028828,
-        "narHash": "sha256-Vy1rq5AaRuLzOxct8nz4T6wlgyUR7zLU309k9mBC768=",
-        "owner": "nix-systems",
-        "repo": "default",
-        "rev": "da67096a3b9bf56a91d16901293e51ba5b49a27e",
+        "lastModified": 1708697125,
+        "narHash": "sha256-JeMK8G1oabQTSpqXhYaYtPRak4m6z1xxyRKf8CvHy14=",
+        "owner": "srid",
+        "repo": "empty",
+        "rev": "23d743284b73ae69caf0cb7874edf05c0c631a1f",
         "type": "github"
       },
       "original": {
-        "owner": "nix-systems",
-        "repo": "default",
+        "owner": "srid",
+        "repo": "empty",
         "type": "github"
       }
     }
