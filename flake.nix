@@ -1,22 +1,29 @@
 {
   inputs = {
     nixpkgs.url = "github:nixos/nixpkgs/nixpkgs-unstable";
-    systems.url = "github:nix-systems/default";
+    allowed-systems.url = "github:nix-systems/default";
     flake-parts.url = "github:hercules-ci/flake-parts";
+    # The systems to build for. If empty, build for current system.
+    systems.url = "github:srid/empty";
     flake = { };
   };
-  outputs = inputs@{ flake-parts, systems, ... }:
+  outputs = inputs@{ flake-parts, ... }:
     flake-parts.lib.mkFlake { inherit inputs; } {
-      systems = import systems;
+      systems = import inputs.allowed-systems;
       perSystem = { self', pkgs, lib, system, ... }: {
         packages.default =
           let
-            configForCurrentSystem = cfg: cfg.config.nixpkgs.hostPlatform.system == system;
+            build-systems = 
+              let systems = import inputs.systems; 
+              in if systems == [ ] then [ system ] else systems;
+            shouldBuildOn = s: lib.elem s build-systems;
+            configForCurrentSystem = cfg: 
+              shouldBuildOn cfg.config.nixpkgs.hostPlatform.system;
             # Given a flake output key, how to get the buildable derivation for
             # any of its attr values?
             flakeSchema = {
               perSystem = {
-                lookupFlake = k: lib.attrByPath [ k system ] { };
+                lookupFlake = k: lib.flip builtins.map build-systems (sys: lib.attrByPath [ k sys ] { });
                 getDrv = {
                   packages = _: x: [ x ];
                   checks = _: x: [ x ];
