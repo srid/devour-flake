@@ -18,7 +18,7 @@
               in if systems == [ ] then [ system ] else systems;
             shouldBuildOn = s: lib.elem s build-systems;
             getSystem = cfg:
-              cfg.config.nixpkgs.localSystem.system;
+              cfg.pkgs.stdenv.hostPlatform.system;
             configForCurrentSystem = cfg:
               shouldBuildOn (getSystem cfg);
             # Given a flake output key, how to get the buildable derivation for
