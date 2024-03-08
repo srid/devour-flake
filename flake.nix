@@ -17,8 +17,10 @@
               let systems = import inputs.systems;
               in if systems == [ ] then [ system ] else systems;
             shouldBuildOn = s: lib.elem s build-systems;
+            getSystem = cfg:
+              cfg.pkgs.stdenv.hostPlatform.system;
             configForCurrentSystem = cfg:
-              shouldBuildOn cfg.config.nixpkgs.hostPlatform.system;
+              shouldBuildOn (getSystem cfg);
             # Given a flake output key, how to get the buildable derivation for
             # any of its attr values?
             flakeSchema = {
