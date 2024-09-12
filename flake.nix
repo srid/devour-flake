@@ -11,7 +11,7 @@
     flake-parts.lib.mkFlake { inherit inputs; } {
       systems = import inputs.allowed-systems;
       perSystem = { self', pkgs, lib, system, ... }: {
-        packages.default =
+        packages =
           let
             build-systems =
               let systems = import inputs.systems;
@@ -60,8 +60,24 @@
                     (lvlSchema.lookupFlake kind inputs.flake)
                 )
               );
+            nameForStorePath = path:
+              if builtins.typeOf path == "set"
+                then path.pname or path.name or null
+                else null;
+            result = rec {
+              out-paths = lib.lists.flatten paths;
+              # Indexed by the path's unique name
+              # Paths without such a name will be ignored. Hence, you must rely on `out_paths` for comprehensive list of outputs.
+              by-name = lib.foldl' (acc: path:
+                let name = nameForStorePath path;
+                in if name == null then acc else acc // { "${name}" = path; }
+              ) { } out-paths;
+            };
           in
-          pkgs.writeText "devour-output" (lib.strings.concatLines (lib.lists.flatten paths));
+          rec {
+            json = pkgs.writeText "devour-output.json" (builtins.toJSON result);
+            default = pkgs.writeText "devour-output" (lib.strings.concatLines result.out-paths);
+          };
       };
     };
 }
