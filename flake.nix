@@ -49,6 +49,8 @@
                     lib.optional (configForCurrentSystem cfg) cfg.config.system.build.toplevel;
                   darwinConfigurations = _: cfg:
                     lib.optional (configForCurrentSystem cfg) cfg.config.system.build.toplevel;
+                  homeConfigurations = _: cfg:
+                    lib.optional (configForCurrentSystem cfg) cfg.activationPackage;
                 };
               };
             };

@@ -17,7 +17,7 @@ devour-flake currently detects the following flake outputs:
 | Standard flake outputs | `packages`, `apps`, `checks`, `devShells` |
 | NixOS | `nixosConfigurations.*` |
 | nix-darwin | `darwinConfigurations.*` |
-| home-manager | `legacyPackages.${system}.homeConfigurations.*` |
+| home-manager | `legacyPackages.${system}.homeConfigurations.*`, `homeConfigurations.*` |
 
 
 ## Usage
