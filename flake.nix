@@ -1,7 +1,6 @@
 {
   inputs = {
     nixpkgs.url = "github:nixos/nixpkgs/nixpkgs-unstable";
-    allowed-systems.url = "github:nix-systems/default";
     flake-parts.url = "github:hercules-ci/flake-parts";
     # The systems to build for. If empty, build for current system.
     systems.url = "github:srid/empty";
@@ -9,7 +8,7 @@
   };
   outputs = inputs@{ flake-parts, ... }:
     flake-parts.lib.mkFlake { inherit inputs; } {
-      systems = import inputs.allowed-systems;
+      systems = [ "x86_64-linux" "aarch64-linux" "aarch64-darwin" "x86_64-darwin" ];
       perSystem = { self', pkgs, lib, system, ... }: {
         packages =
           let
