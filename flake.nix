@@ -53,39 +53,71 @@
               };
             };
           };
-          paths =
+          # Group paths by system
+          pathsBySystem =
             lib.flip lib.mapAttrsToList flakeSchema (_: lvlSchema:
               lib.flip lib.mapAttrsToList lvlSchema.getDrv (kind: getDrv:
-                builtins.concatMap
-                  (attr: lib.mapAttrsToList getDrv attr)
-                  (lvlSchema.lookupFlake kind inputs.flake)
+                # For perSystem outputs, return system-tagged paths
+                if lvlSchema ? lookupFlake && kind != "nixosConfigurations" && kind != "darwinConfigurations"
+                then
+                  lib.flip builtins.map build-systems (sys:
+                    let attr = lib.attrByPath [ kind sys ] { } inputs.flake;
+                    in {
+                      system = sys;
+                      paths = lib.mapAttrsToList getDrv attr;
+                    }
+                  )
+                else
+                  # For flake-level outputs, assign based on target system
+                  let attr = lib.attrByPath [ kind ] { } inputs.flake;
+                  in lib.mapAttrsToList (_: cfg:
+                    {
+                      system = getSystem cfg;
+                      paths = getDrv _ cfg;
+                    }
+                  ) attr
               )
             );
           nameForStorePath = path:
             if builtins.typeOf path == "set"
               then path.pname or path.name or null
               else null;
-          result = rec {
-            outPaths =
-              let flattened = lib.lists.flatten paths;
-              in lib.sort (a: b: toString a < toString b) flattened;
-            # Indexed by the path's unique name
-            # Paths without such a name will be ignored. Hence, you must rely on `out_paths` for comprehensive list of outputs.
-            byName = lib.foldl' (acc: path:
-              let name = nameForStorePath path;
-              in if name == null then acc else
-                acc // {
-                  "${name}" =
-                    if acc ? "${name}"
-                    then acc.${name} ++ [ path ]
-                    else [ path ];
-                }
-            ) { } outPaths;
-          };
+
+          # Build result for each system
+          buildResultForSystem = sys:
+            let
+              systemPaths = lib.lists.flatten (
+                lib.filter (x: x.system == sys)
+                  (lib.lists.flatten (lib.lists.flatten pathsBySystem))
+              );
+              outPaths =
+                let flattened = lib.lists.flatten (map (x: x.paths) systemPaths);
+                in lib.sort (a: b: toString a < toString b) flattened;
+            in rec {
+              inherit outPaths;
+              byName = lib.foldl' (acc: path:
+                let name = nameForStorePath path;
+                in if name == null then acc else
+                  acc // { "${name}" = path; }
+              ) { } outPaths;
+            };
+
+          result = lib.listToAttrs (
+            map (sys: {
+              name = sys;
+              value = buildResultForSystem sys;
+            }) build-systems
+          );
         in
         rec {
           json = pkgs.writeText "devour-output.json" (builtins.toJSON result);
-          default = pkgs.writeText "devour-output" (lib.strings.concatLines result.outPaths);
+          default = pkgs.writeText "devour-output" (
+            lib.strings.concatLines (
+              lib.lists.flatten (
+                lib.mapAttrsToList (_: v: v.outPaths) result
+              )
+            )
+          );
         }
       );
     };
