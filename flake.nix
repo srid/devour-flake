@@ -58,7 +58,9 @@
           # Build result organized by system
           result = builtins.listToAttrs (map (sys:
             let
-              outPaths = lib.sort (a: b: "${a}" < "${b}") (collectPathsForSystem sys);
+              allPaths = collectPathsForSystem sys;
+              uniquePaths = lib.unique allPaths;
+              outPaths = lib.sort (a: b: "${a}" < "${b}") uniquePaths;
               byName = lib.foldl' (acc: path:
                 let name = nameForStorePath path;
                 in if name == null then acc else acc // { "${name}" = path; }
