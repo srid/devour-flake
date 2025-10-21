@@ -66,7 +66,9 @@
               then path.pname or path.name or null
               else null;
           result = rec {
-            outPaths = lib.sort (a: b: a < b) (lib.lists.flatten paths);
+            outPaths =
+              let flattened = lib.lists.flatten paths;
+              in lib.sort (a: b: toString a < toString b) flattened;
             # Indexed by the path's unique name
             # Paths without such a name will be ignored. Hence, you must rely on `out_paths` for comprehensive list of outputs.
             byName = lib.foldl' (acc: path:
