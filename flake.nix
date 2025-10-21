@@ -17,67 +17,60 @@
           build-systems =
             let systems = import inputs.systems;
             in if systems == [ ] then [ system ] else systems;
-          shouldBuildOn = s: lib.elem s build-systems;
-          getSystem = cfg:
-            cfg.pkgs.stdenv.hostPlatform.system;
-          configForCurrentSystem = cfg:
-            shouldBuildOn (getSystem cfg);
-          # Given a flake output key, how to get the buildable derivation for
-          # any of its attr values?
-          flakeSchema = {
-            perSystem = {
-              # -> [ path ]
-              lookupFlake = k: flake:
-                lib.flip builtins.map build-systems (sys:
-                  lib.attrByPath [ k sys ] { } flake
-                );
-              getDrv = {
-                packages = _: x: [ x ];
-                checks = _: x: [ x ];
-                devShells = _: x: [ x ];
-                apps = _: app: [ app.program ];
-                legacyPackages = k: v:
-                  if k == "homeConfigurations"
-                  then
-                    lib.mapAttrsToList (_: cfg: cfg.activationPackage) v
-                  else [ ];
-              };
-            };
-            flake = {
-              lookupFlake = k: flake: [ (lib.attrByPath [ k ] { } flake) ];
-              getDrv = {
-                nixosConfigurations = _: cfg:
-                  lib.optional (configForCurrentSystem cfg) cfg.config.system.build.toplevel;
-                darwinConfigurations = _: cfg:
-                  lib.optional (configForCurrentSystem cfg) cfg.config.system.build.toplevel;
-              };
-            };
-          };
-          paths =
-            lib.flip lib.mapAttrsToList flakeSchema (_: lvlSchema:
-              lib.flip lib.mapAttrsToList lvlSchema.getDrv (kind: getDrv:
-                builtins.concatMap
-                  (attr: lib.mapAttrsToList getDrv attr)
-                  (lvlSchema.lookupFlake kind inputs.flake)
-              )
-            );
+          getSystem = cfg: cfg.pkgs.stdenv.hostPlatform.system;
           nameForStorePath = path:
             if builtins.typeOf path == "set"
-              then path.pname or path.name or null
-              else null;
-          result = rec {
-            outPaths = lib.lists.flatten paths;
-            # Indexed by the path's unique name
-            # Paths without such a name will be ignored. Hence, you must rely on `out_paths` for comprehensive list of outputs.
-            byName = lib.foldl' (acc: path:
-              let name = nameForStorePath path;
-              in if name == null then acc else acc // { "${name}" = path; }
-            ) { } outPaths;
-          };
+            then path.pname or path.name or null
+            else null;
+
+          # Collect paths for a specific system
+          collectPathsForSystem = sys:
+            let
+              # Helper to extract derivations from attrs
+              getDrvs = kind: attrs:
+                if kind == "packages" || kind == "checks" || kind == "devShells" then
+                  lib.attrValues attrs
+                else if kind == "apps" then
+                  map (app: app.program) (lib.attrValues attrs)
+                else if kind == "legacyPackages" then
+                  lib.optionals (attrs ? homeConfigurations)
+                    (lib.mapAttrsToList (_: cfg: cfg.activationPackage) attrs.homeConfigurations)
+                else [ ];
+
+              # Per-system outputs
+              perSystemPaths = lib.concatMap (kind:
+                getDrvs kind (lib.attrByPath [ kind sys ] { } inputs.flake)
+              ) [ "packages" "checks" "devShells" "apps" "legacyPackages" ];
+
+              # Flake-level outputs (nixosConfigurations, darwinConfigurations)
+              flakePaths = lib.concatMap (kind:
+                let
+                  configs = lib.attrByPath [ kind ] { } inputs.flake;
+                  configsForSys = lib.filterAttrs (_: cfg:
+                    getSystem cfg == sys
+                  ) configs;
+                in
+                  map (cfg: cfg.config.system.build.toplevel) (lib.attrValues configsForSys)
+              ) [ "nixosConfigurations" "darwinConfigurations" ];
+            in
+              perSystemPaths ++ flakePaths;
+
+          # Build result organized by system
+          result = builtins.listToAttrs (map (sys:
+            let
+              allPaths = collectPathsForSystem sys;
+              uniquePaths = lib.unique allPaths;
+              outPaths = lib.sort (a: b: "${a}" < "${b}") uniquePaths;
+              byName = lib.foldl' (acc: path:
+                let name = nameForStorePath path;
+                in if name == null then acc else acc // { "${name}" = path; }
+              ) { } outPaths;
+            in
+              { name = sys; value = { inherit outPaths byName; }; }
+          ) build-systems);
         in
-        rec {
-          json = pkgs.writeText "devour-output.json" (builtins.toJSON result);
-          default = pkgs.writeText "devour-output" (lib.strings.concatLines result.outPaths);
+        {
+          default = pkgs.writeText "devour-output.json" (builtins.toJSON result);
         }
       );
     };
