@@ -1,5 +1,6 @@
 {
   inputs = {
+    nixpkgs.url = "github:NixOS/nixpkgs/nixos-25.05";
     # The systems to build for. If empty, build for current system.
     systems.url = "github:srid/empty";
     flake = { };
@@ -12,7 +13,7 @@
     {
       packages = forAllSystems (system:
         let
-          pkgs = import inputs.flake.inputs.nixpkgs { inherit system; };
+          pkgs = import inputs.nixpkgs { inherit system; };
           lib = pkgs.lib;
           build-systems =
             let systems = import inputs.systems;
