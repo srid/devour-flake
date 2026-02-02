@@ -13,7 +13,7 @@ jobs:
       - name: Install Nix
         uses: DeterminateSystems/nix-installer-action@main
         with:
-          extra-nix-config: |
+          extra-conf: |
             experimental-features = nix-command flakes impure-derivations ca-derivations
       - name: Test
         run: ./test/test.sh
