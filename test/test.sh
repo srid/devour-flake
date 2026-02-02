@@ -8,3 +8,6 @@ nix build .. --override-input flake github:srid/haskell-multi-nix/c85563721c3886
 diff expected result
 
 rm -f result
+
+# Run impure flake tests
+./test_impure.sh
