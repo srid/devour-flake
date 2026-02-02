@@ -57,7 +57,7 @@
               perSystemPaths ++ flakePaths;
 
           # Build result organized by system
-          result = builtins.listToAttrs (map (sys:
+          buildResultForSystem = sys:
             let
               allPaths = collectPathsForSystem sys;
               uniquePaths = lib.unique allPaths;
@@ -67,11 +67,35 @@
                 in if name == null then acc else acc // { "${name}" = path; }
               ) { } outPaths;
             in
-              { name = sys; value = { inherit outPaths byName; }; }
-          ) build-systems);
+              { inherit allPaths outPaths byName; };
+
+          resultsBySystem = map (sys: { name = sys; value = buildResultForSystem sys; }) build-systems;
+
+          result = builtins.listToAttrs (map (item:
+            {
+              name = item.name;
+              value = { inherit (item.value) outPaths byName; };
+            }
+          ) resultsBySystem);
+
+          hasImpure = drv:
+            if lib.isDerivation drv
+            then drv.__impure or false
+            else false;
+
+          isImpure = lib.any (item: lib.any hasImpure item.value.allPaths) resultsBySystem;
         in
         {
-          default = pkgs.writeText "devour-output.json" (builtins.toJSON result);
+          default =
+            let
+              drv = pkgs.writeText "devour-output.json" (builtins.toJSON result);
+            in
+              if isImpure
+              then
+                lib.overrideDerivation drv (old: {
+                  __impure = true;
+                })
+              else drv;
         }
       );
     };
